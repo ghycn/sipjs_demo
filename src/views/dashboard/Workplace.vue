@@ -57,6 +57,14 @@ export default {
       simpleUser: null
     }
   },
+  mounted () {
+    // window.addEventListener('beforeunload', e => this.beforeunloadHandler(e));
+    window.addEventListener('beforeunload', this.beforeunloadHandler, false)
+  },
+  beforeDestroy () {
+    window.removeEventListener('beforeunload', this.beforeunloadHandler, false)
+      // this.destroyedBeforeunloadHandler()
+  },
   methods: {
     // 初始换铃声
     initIncomingCallAudio () {
@@ -195,7 +203,6 @@ export default {
         })
       this.formData.callDisable = false
     },
-
     callPhone () {
       if (!this.formData.callPhoneUri) {
         this.$message.error('请填写被叫叫分机号！')
@@ -203,6 +210,19 @@ export default {
       }
       const callNumber = `${this.formData.protocol}:${this.formData.callPhoneUri}@${this.formData.host}`
       this.simpleUser.call(callNumber)
+    },
+    // beforeunload监听事件
+    beforeunloadHandler (e) {
+      e.returnValue = '确定要关闭窗口吗？'
+        console.log('释放权限操作')
+        this.simpleUser.hangup()
+        // 释放权限操作，无阻塞
+        // 用户点击取消后执行，恢复操作
+        setTimeout(function () {
+            setTimeout(function () {
+             console.log('恢复用户权限操作')
+             }, 50)
+        }, 50)
     }
   }
 }
