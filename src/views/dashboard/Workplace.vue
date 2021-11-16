@@ -4,15 +4,14 @@
     <a-col :span="12">
       <a-card class="card-wrapper">
         <a-form ref="form" :model="formData" label-width="100px">
-
+          <a-form-item label="FreeSwitch Host:">
+            <a-input v-model="formData.host" placeholder="192.168.0.104"></a-input>
+          </a-form-item>
           <a-form-item label="SIP 账号:">
             <a-input v-model="formData.account" placeholder="1005"></a-input>
           </a-form-item>
           <a-form-item label="SIP 密码:">
             <a-input v-model="formData.password" placeholder="SIP 密码"></a-input>
-          </a-form-item>
-          <a-form-item label="FreeSwitch Host:">
-            <a-input v-model="formData.host" placeholder="192.168.0.104"></a-input>
           </a-form-item>
           <a-form-item label="SIP 呼叫地址:">
             <a-input v-model="formData.callPhoneUri" placeholder="例如: 1008"></a-input>
@@ -83,6 +82,8 @@ export default {
             video: document.getElementById('remoteVideo')
           }
         },
+        reconnectionAttempts: 100,
+        reconnectionDelay: 5,
         userAgentOptions: {
           displayName: this.formData.account,
           contactName: this.formData.account,
@@ -104,8 +105,6 @@ export default {
               }
             }
           },
-          reconnectionAttempts: 100, // 重连次数
-          reconnectionDelay: 5, // 重连延迟
           hackWssInTransport: true,
           hackIpInContact: this.formData.host,
           authorizationUsername: this.formData.account,
