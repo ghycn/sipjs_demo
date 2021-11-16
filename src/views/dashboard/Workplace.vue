@@ -82,8 +82,8 @@ export default {
             video: document.getElementById('remoteVideo')
           }
         },
-        reconnectionAttempts: 100,
-        reconnectionDelay: 5,
+        reconnectionAttempts: 100, // 重新连接次数
+        reconnectionDelay: 5, // 重连间隔秒数
         userAgentOptions: {
           displayName: this.formData.account,
           contactName: this.formData.account,
