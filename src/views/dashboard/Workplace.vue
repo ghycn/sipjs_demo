@@ -20,6 +20,7 @@
             <a-button type="primary" @click="initSipParams"> 初始化 </a-button>
             <a-button type="success" @click="callPhone" :disabled="formData.callDisable"> Call </a-button>
             <a-button id="endCall" type="error"> 挂断 </a-button>
+            <a-button id="unregister" type="error"> 注销 </a-button>
           </a-form-item>
         </a-form>
       </a-card>
@@ -47,7 +48,7 @@ export default {
         port: 7443,
         transport: 'wss',
         protocol: 'sip',
-        account: '1005',
+        account: '',
         password: '123456',
         callDisable: true
       },
@@ -91,7 +92,8 @@ export default {
             transport: this.formData.transport
           },
           transportOptions: {
-            server: ws_server
+            server: ws_server,
+            traceSip: false
           },
           sessionDescriptionHandlerFactoryOptions: {
             peerConnectionOptions: {
@@ -105,19 +107,20 @@ export default {
               }
             }
           },
+          hackViaTcp: false,
           hackWssInTransport: true,
           hackIpInContact: this.formData.host,
           authorizationUsername: this.formData.account,
           authorizationPassword: this.formData.password,
           allowLegacyNotifications: true,
           registerExpires: 600,
-          traceSip: true,
+          noAnswerTimeout: 60,
           log: {
             builtinEnabled: false,
             // level, category, label, content
-            // connector: (...args) => {
-            //   console.log(args)
-            // },
+            connector: (...args) => {
+              console.log(args)
+            },
             level: 'debug' // "debug", "log", "warn", "error"
           }
         }
@@ -142,6 +145,7 @@ export default {
         },
         onRegistered: () => {
           console.log(`Registered...`)
+          console.log(this.simpleUser)
         },
         onUnregistered: () => {
           console.log(`Unregistered...`)
@@ -175,6 +179,7 @@ export default {
         },
         onCallHangup: () => {
             console.log('Call Hangup...')
+            console.log(this.simpleUser)
         }
       }
       // Connect to server and place call
