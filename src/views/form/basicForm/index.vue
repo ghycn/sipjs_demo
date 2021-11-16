@@ -1,204 +1,133 @@
-/* eslint-disable camelcase */
 <template>
-  <div style="">
-    <a-col :span="12">
-      <a-card class="card-wrapper">
-        <a-form ref="form" :model="formData" label-width="100px">
-
-          <a-form-item label="SIP 账号:">
-            <a-input v-model="formData.account" placeholder="1005"></a-input>
+  <!-- hidden PageHeaderWrapper title demo -->
+  <page-header-wrapper :title="false" :content="$t('form.basic-form.basic.description')">
+    <a-card :body-style="{padding: '24px 32px'}" :bordered="false">
+      <a-form @submit="handleSubmit" :form="form">
+        <a-form-item
+          :label="$t('form.basic-form.title.label')"
+          :labelCol="{lg: {span: 7}, sm: {span: 7}}"
+          :wrapperCol="{lg: {span: 10}, sm: {span: 17} }">
+          <a-input
+            v-decorator="[
+              'name',
+              {rules: [{ required: true, message: $t('form.basic-form.title.required') }]}
+            ]"
+            name="name"
+            :placeholder="$t('form.basic-form.title.placeholder')" />
+        </a-form-item>
+        <a-form-item
+          :label="$t('form.basic-form.date.label')"
+          :labelCol="{lg: {span: 7}, sm: {span: 7}}"
+          :wrapperCol="{lg: {span: 10}, sm: {span: 17} }">
+          <a-range-picker
+            name="buildTime"
+            style="width: 100%"
+            v-decorator="[
+              'buildTime',
+              {rules: [{ required: true, message: $t('form.basic-form.date.required') }]}
+            ]" />
+        </a-form-item>
+        <a-form-item
+          :label="$t('form.basic-form.goal.label')"
+          :labelCol="{lg: {span: 7}, sm: {span: 7}}"
+          :wrapperCol="{lg: {span: 10}, sm: {span: 17} }">
+          <a-textarea
+            rows="4"
+            :placeholder="$t('form.basic-form.goal.placeholder')"
+            v-decorator="[
+              'description',
+              {rules: [{ required: true, message: $t('form.basic-form.goal.required') }]}
+            ]" />
+        </a-form-item>
+        <a-form-item
+          :label="$t('form.basic-form.standard.label')"
+          :labelCol="{lg: {span: 7}, sm: {span: 7}}"
+          :wrapperCol="{lg: {span: 10}, sm: {span: 17} }">
+          <a-textarea
+            rows="4"
+            :placeholder="$t('form.basic-form.standard.placeholder')"
+            v-decorator="[
+              'type',
+              {rules: [{ required: true, message: $t('form.basic-form.standard.required') }]}
+            ]" />
+        </a-form-item>
+        <a-form-item
+          :label="$t('form.basic-form.client.label')"
+          :labelCol="{lg: {span: 7}, sm: {span: 7}}"
+          :wrapperCol="{lg: {span: 10}, sm: {span: 17} }">
+          <a-input
+            :placeholder="$t('form.basic-form.client.placeholder')"
+            v-decorator="[
+              'customer',
+              {rules: [{ required: true, message: $t('form.basic-form.client.required') }]}
+            ]" />
+        </a-form-item>
+        <a-form-item
+          :label="$t('form.basic-form.invites.label')"
+          :labelCol="{lg: {span: 7}, sm: {span: 7}}"
+          :wrapperCol="{lg: {span: 10}, sm: {span: 17} }"
+          :required="false"
+        >
+          <a-input :placeholder="$t('form.basic-form.invites.placeholder')" />
+        </a-form-item>
+        <a-form-item
+          :label="$t('form.basic-form.weight.label')"
+          :labelCol="{lg: {span: 7}, sm: {span: 7}}"
+          :wrapperCol="{lg: {span: 10}, sm: {span: 17} }"
+          :required="false"
+        >
+          <a-input-number :min="0" :max="100" />
+          <span> %</span>
+        </a-form-item>
+        <a-form-item
+          :label="$t('form.basic-form.public.label')"
+          :labelCol="{lg: {span: 7}, sm: {span: 7}}"
+          :wrapperCol="{lg: {span: 10}, sm: {span: 17} }"
+          :required="false"
+          :help="$t('form.basic-form.label.help')"
+        >
+          <a-radio-group v-decorator="['target', { initialValue: 1 }]">
+            <a-radio :value="1">{{ $t('form.basic-form.radio.public') }}</a-radio>
+            <a-radio :value="2">{{ $t('form.basic-form.radio.partially-public') }}</a-radio>
+            <a-radio :value="3">{{ $t('form.basic-form.radio.private') }}</a-radio>
+          </a-radio-group>
+          <a-form-item v-show="form.getFieldValue('target') === 2">
+            <a-select mode="multiple">
+              <a-select-option value="4">{{ $t('form.basic-form.option.A') }}</a-select-option>
+              <a-select-option value="5">{{ $t('form.basic-form.option.B') }}</a-select-option>
+              <a-select-option value="6">{{ $t('form.basic-form.option.C') }}</a-select-option>
+            </a-select>
           </a-form-item>
-          <a-form-item label="SIP 密码:">
-            <a-input v-model="formData.password" placeholder="SIP 密码"></a-input>
-          </a-form-item>
-          <a-form-item label="FreeSwitch Host:">
-            <a-input v-model="formData.host" placeholder="192.168.0.104"></a-input>
-          </a-form-item>
-          <a-form-item label="SIP 呼叫地址:">
-            <a-input v-model="formData.callPhoneUri" placeholder="例如: 1008"></a-input>
-          </a-form-item>
-          <a-form-item class="submit-form-item">
-            <a-button type="primary" @click="initSipParams"> 初始化 </a-button>
-            <a-button type="success" @click="callPhone" :disabled="formData.callDisable"> Call </a-button>
-            <a-button id="endCall" type="error"> 挂断 </a-button>
-          </a-form-item>
-        </a-form>
-      </a-card>
-    </a-col>
-    <a-col :span="12">
-      <a-card class="card-wrapper">
-        <video id="localVideo" muted="muted" hidden></video>
-        <video id="remoteVideo"></video>
-      </a-card>
-    </a-col>
-  </div>
+        </a-form-item>
+        <a-form-item
+          :wrapperCol="{ span: 24 }"
+          style="text-align: center"
+        >
+          <a-button htmlType="submit" type="primary">{{ $t('form.basic-form.form.submit') }}</a-button>
+          <a-button style="margin-left: 8px">{{ $t('form.basic-form.form.save') }}</a-button>
+        </a-form-item>
+      </a-form>
+    </a-card>
+  </page-header-wrapper>
 </template>
 
 <script>
-import { Web } from 'sip.js'
-// import Sipphone from '@/utils/sipphone'
-// import SimpleUser from '@/utils/simple-user'
-
 export default {
   name: 'BaseForm',
   data () {
     return {
-      formData: {
-        host: '172.16.20.253',
-        port: 7443,
-        transport: 'wss',
-        protocol: 'sip',
-        account: '1005',
-        password: '123456',
-        callDisable: true
-      },
-      // 铃声
-      incomingCallAudio: null,
-      simpleUser: null
+      form: this.$form.createForm(this)
     }
   },
   methods: {
-    // 初始换铃声
-    initIncomingCallAudio () {
-      this.incomingCallAudio = new window.Audio('http://study.closeeyes.cn/incoming-call-ringtone.mp3')
-      this.incomingCallAudio.loop = true
-    },
-    // 初始化sip参数
-    async initSipParams () {
-      if (!this.formData.account) return this.$message.error('请填写分机号！')
-      if (!this.formData.password) return this.$message.error('请填写分机密码！')
-      // eslint-disable-next-line camelcase
-      const ws_server = `${this.formData.transport}://${this.formData.host}:${this.formData.port}`
-      const options = {
-        aor: `${this.formData.protocol}:${this.formData.account}@${this.formData.host}:${this.formData.port}`, // caller
-        media: {
-          constraints: {
-            audio: true,
-            video: true
-          },
-          local: {
-            video: document.getElementById('localVideo')
-          },
-          remote: {
-            video: document.getElementById('remoteVideo')
-          }
-        },
-        userAgentOptions: {
-          displayName: this.formData.account,
-          contactName: this.formData.account,
-          contactParams: {
-            transport: this.formData.transport
-          },
-          transportOptions: {
-            server: ws_server
-          },
-          sessionDescriptionHandlerFactoryOptions: {
-            peerConnectionOptions: {
-              rtcConfiguration: {
-                iceServers: [
-                  { urls: 'stun:stun1.l.google.com:19302' },
-                  { urls: 'stun:stun.fwdnet.net' },
-                  { urls: 'stun:stun.ekiga.net' },
-                  { urls: 'stun:stun.ideasip.com' }
-                ]
-              }
-            }
-          },
-          reconnectionAttempts: 100, // 重连次数
-          reconnectionDelay: 5, // 重连延迟
-          hackWssInTransport: true,
-          hackIpInContact: this.formData.host,
-          authorizationUsername: this.formData.account,
-          authorizationPassword: this.formData.password,
-          allowLegacyNotifications: true,
-          registerExpires: 600,
-          traceSip: true,
-          log: {
-            builtinEnabled: false,
-            // level, category, label, content
-            // connector: (...args) => {
-            //   console.log(args)
-            // },
-            level: 'debug' // "debug", "log", "warn", "error"
-          }
+    // handler
+    handleSubmit (e) {
+      e.preventDefault()
+      this.form.validateFields((err, values) => {
+        if (!err) {
+          console.log('Received values of form: ', values)
         }
-      }
-      this.simpleUser = new Web.SimpleUser(ws_server, options)
-      const endButton = document.getElementById('endCall')
-      endButton.addEventListener(
-        'click',
-        async () => {
-          await this.simpleUser.hangup()
-          alert('Call Ended')
-        },
-        false
-      )
-      // 状态监听
-      this.simpleUser.delegate = {
-        onServerConnect: () => {
-          console.log(`Server Connect...`)
-        },
-        onServerDisconnect: () => {
-          console.log(`Server Disconnect...`)
-        },
-        onRegistered: () => {
-          console.log(`Registered...`)
-        },
-        onUnregistered: () => {
-          console.log(`Unregistered...`)
-        },
-        onMessageReceived: (message) => {
-          console.log('收到消息', message)
-        },
-        onCallCreated: () => {
-          console.log('Call Created...')
-        },
-        onCallAnswered: () => {
-          console.log('Call Answered...')
-        },
-        onCallReceived: async () => {
-          console.log('来电session...', this.simpleUser.session)
-          const number = this.simpleUser.session.remoteIdentity.uri.user
-          const displayName = this.simpleUser.session.remoteIdentity.displayName
-          console.log('来电名称', number)
-          console.log('来电号码', displayName)
-          const _this = this
-          this.$confirm({
-            title: `用户${displayName}来电，是否接听?`,
-            content: number,
-            onOk () {
-              _this.simpleUser.answer()
-            },
-            onCancel () {
-              _this.simpleUser.hangup()
-            }
-          })
-        },
-        onCallHangup: () => {
-            console.log('Call Hangup...')
-        }
-      }
-      // Connect to server and place call
-      this.simpleUser
-        .connect()
-        .then(() => {
-          console.log('连接成功！')
-          this.simpleUser.register()
-        })
-        .catch(error => {
-          console.log('sip连接失败', error)
-          // Call failed
-        })
-      this.formData.callDisable = false
-    },
-
-    callPhone () {
-      if (!this.formData.callPhoneUri) {
-        this.$message.error('请填写被叫叫分机号！')
-        return
-      }
-      const callNumber = `${this.formData.protocol}:${this.formData.callPhoneUri}@${this.formData.host}`
-      this.simpleUser.call(callNumber)
+      })
     }
   }
 }
